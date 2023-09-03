@@ -4,13 +4,10 @@ import os
 
 from telegram import __version__ as TG_VER
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from TOKEN import TOKEN
-from Classes.pokemonAPI import PokemonAPI
-from TEXTS import translate
-
-pokemonAPI = PokemonAPI()
+from Classes.pokemon import Pokemon
 
 try:
     from telegram import __version_info__
@@ -50,33 +47,23 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     """Send a message when the command /help is issued."""
     await update.message.reply_text("Help!")
 
-async def search_pokemon(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    pokemon_name = update.message.text.replace("/pokemon", "").strip().lower()
-    pokemonAPI.get_api_data(pokemon_name)
-    pokemon = pokemonAPI.elaborate_api_data()
-    
-    await context.bot.send_photo(
-        chat_id = update.effective_chat.id,
-        caption = translate("POKEDEX_RETURN_MESSAGE", language="IT", data={
-            "name": pokemon.name,
-            "id" : pokemon.id,
-            "types" : pokemon.types,
-            "description" : pokemon.description
-        }),
-        photo = pokemon.photo,
-        reply_to_message_id=update.message.message_id
-    )
+
+async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Echo the user message."""
+    await update.message.reply_text(update.message.text)
 
 
 def main() -> None:
     """Start the bot."""
     # Create the Application and pass it your bot's token.
-    application = Application.builder().token(TOKEN).build()
+    application = Application.builder().token("TOKEN").build()
 
     # on different commands - answer in Telegram
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("help", help_command))
-    application.add_handler(CommandHandler("pokemon", search_pokemon))
+
+    # on non command i.e message - echo the message on Telegram
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
 
     # Run the bot until the user presses Ctrl-C
     application.run_polling(allowed_updates=Update.ALL_TYPES)
