@@ -49,7 +49,7 @@ class PokemonAPI:
         descriptions = self.species_data["flavor_text_entries"]
         descriptions_set = set(description["flavor_text"] for description in descriptions if description["language"]["name"] == "it")
 
-        description = " ".join(random.choice(list(descriptions_set)).split())
+        description = " ".join(random.choice(descriptions_set))
 
         return Pokemon(name, id, photo_link, types, description)        
             

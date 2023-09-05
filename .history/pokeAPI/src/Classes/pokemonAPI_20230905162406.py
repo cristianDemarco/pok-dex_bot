@@ -1,7 +1,6 @@
 import requests
 import sys
 import os
-import random
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from Classes.pokemon import Pokemon
@@ -47,9 +46,10 @@ class PokemonAPI:
         types = ", ".join(types)
 
         descriptions = self.species_data["flavor_text_entries"]
-        descriptions_set = set(description["flavor_text"] for description in descriptions if description["language"]["name"] == "it")
 
-        description = " ".join(random.choice(list(descriptions_set)).split())
+        description = set(description for description in description if element["language"]["name"] == "it")
+
+        description = " ".join(description.split())
 
         return Pokemon(name, id, photo_link, types, description)        
             

@@ -70,13 +70,14 @@ async def search_pokemon(update: Update, context: ContextTypes.DEFAULT_TYPE, is_
 
     pokemon_name = pokemon_name.replace("/pokemon", "").strip().lower()
 
+    print(f"\n\n{pokemon_name}, {message_id}, {chat_id}\n\n")
     pokemonAPI.get_api_data(pokemon_name)
     pokemon = pokemonAPI.elaborate_api_data()
 
     keyboard = [
         [
-            InlineKeyboardButton(text = f"< N°{int(pokemon.id) - 1}", callback_data=f"/pokemon {int(pokemon.id) - 1}"),
-            InlineKeyboardButton(text = f"N°{int(pokemon.id) + 1} >", callback_data=f"/pokemon {int(pokemon.id) + 1}")
+            InlineKeyboardButton(text = f"< N°{int(pokemon.id) - 1}", callback_data=f"{pokemon.id + 1}"),
+            InlineKeyboardButton(text = f"N°{int(pokemon.id) + 1} >", callback_data=f"{pokemon.id - 1}")
         ]
     ]
 
