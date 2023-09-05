@@ -55,9 +55,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
-    print(query.data)
-    query_data_dict = json.loads(query.data)
-    if "/pokemon" in query_data_dict["pokemon"]:
+    if "/pokemon" in json.loads(query.data)["pokemon"]:
         is_Callback = True
         await search_pokemon(update, context, is_Callback)
 
@@ -69,33 +67,33 @@ async def search_pokemon(update: Update, context: ContextTypes.DEFAULT_TYPE, is_
         message_id = update.message.message_id
         chat_id = update.effective_chat.id
     elif is_Callback:
-        query_data = json.loads(update.callback_query.data)
+        update.callback_query.data = json.loads(update.callback_query.data)
 
-        pokemon_name = query_data["pokemon"]
+        pokemon_name = update.callback_query.data["pokemon"]
         message_id = update.callback_query.message.message_id
         chat_id = update.callback_query.message.chat.id
 
     pokemon_name = pokemon_name.replace("/pokemon", "").strip().lower()
 
-    pokemonAPI.get_api_data(pokemon_name, query_data["variety"] if is_Callback else 0)
-    pokemon = pokemonAPI.elaborate_api_data(query_data["variety"] if is_Callback else 0)
+    pokemonAPI.get_api_data(pokemon_name, update.callback_query.data["variety"] if is_Callback else 0)
+    pokemon = pokemonAPI.elaborate_api_data(update.callback_query.data["variety"] if is_Callback else 0)
 
     keyboard = [
         [
-            InlineKeyboardButton(text = f"< N°{int(pokemon.id) - 1}", callback_data=json.dumps(
+            InlineKeyboardButton(text = f"< N°{int(pokemon.id) - 1}", callback_data=str(
                     {
                         "pokemon" : f"/pokemon {int(pokemon.id) - 1}"
                     }
                 )
             ),
-            InlineKeyboardButton(text = f"Change Variety", callback_data=json.dumps(            
+            InlineKeyboardButton(text = f"Change Variety", callback_data=str(            
                     {
                         "pokemon" : f"/pokemon {int(pokemon.id)}",
-                        "variety" : f"{int(pokemon.variety) + 1}"
+                        "variety" : pokemon.variety
                     }
                 )
             ),
-            InlineKeyboardButton(text = f"N°{int(pokemon.id) + 1} >", callback_data=json.dumps(
+            InlineKeyboardButton(text = f"N°{int(pokemon.id) + 1} >", callback_data=str(
                     {
                         "pokemon" : f"/pokemon {int(pokemon.id) + 1}"
                     }

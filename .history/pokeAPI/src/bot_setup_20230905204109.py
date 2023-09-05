@@ -69,16 +69,16 @@ async def search_pokemon(update: Update, context: ContextTypes.DEFAULT_TYPE, is_
         message_id = update.message.message_id
         chat_id = update.effective_chat.id
     elif is_Callback:
-        query_data = json.loads(update.callback_query.data)
+        update.callback_query.data = json.loads(update.callback_query.data)
 
-        pokemon_name = query_data["pokemon"]
+        pokemon_name = update.callback_query.data["pokemon"]
         message_id = update.callback_query.message.message_id
         chat_id = update.callback_query.message.chat.id
 
     pokemon_name = pokemon_name.replace("/pokemon", "").strip().lower()
 
-    pokemonAPI.get_api_data(pokemon_name, query_data["variety"] if is_Callback else 0)
-    pokemon = pokemonAPI.elaborate_api_data(query_data["variety"] if is_Callback else 0)
+    pokemonAPI.get_api_data(pokemon_name, update.callback_query.data["variety"] if is_Callback else 0)
+    pokemon = pokemonAPI.elaborate_api_data(update.callback_query.data["variety"] if is_Callback else 0)
 
     keyboard = [
         [
@@ -91,7 +91,7 @@ async def search_pokemon(update: Update, context: ContextTypes.DEFAULT_TYPE, is_
             InlineKeyboardButton(text = f"Change Variety", callback_data=json.dumps(            
                     {
                         "pokemon" : f"/pokemon {int(pokemon.id)}",
-                        "variety" : f"{int(pokemon.variety) + 1}"
+                        "variety" : f"{pokemon.variety + 1}"
                     }
                 )
             ),

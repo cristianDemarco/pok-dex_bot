@@ -20,7 +20,7 @@ class PokemonAPI:
         if species_data_response.status_code == 200:
             self.species_data = species_data_response.json()
             
-        if variety > len(self.species_data["varieties"]) - 1:
+        if variety > len(self.species_data["varieties"] - 1):
             variety = 0
                     
         pokemon_variety = self.species_data["varieties"][variety]["pokemon"]["name"]
@@ -34,7 +34,7 @@ class PokemonAPI:
 
         name = self.data["name"].capitalize().split("-", 1)[0]
         
-        id = str(self.species_data["id"])
+        id = str(self.data["id"])
 
         photo = self.data["sprites"]["other"]["official-artwork"]["front_default"]
         photo_link = photo.replace("PokeAPI/sprites", "cristianDemarco/PokeAPI_sprites")

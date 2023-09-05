@@ -2,7 +2,7 @@ from typing import List
 
 class Pokemon:
     
-    def __init__(self, name : str = "Undefined", id : str = "Undefined", generation : str = "Undefined", is_legendary : bool = False, photo : str = "Undefined", types : List = [], description : str = "Undefined", variety : int = 0) -> None:
+    def __init__(self, name : str = "Undefined", id : str = "Undefined", generation : str = "Undefined", is_legendary : bool = False, photo : str = "Undefined", types : List = [], description : str = "Undefined") -> None:
         self.name = name
         self.id = id
         self.generation = generation

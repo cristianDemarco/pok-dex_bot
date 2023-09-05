@@ -2,7 +2,6 @@ import logging
 import sys
 import os
 import time
-import json
 
 from telegram import __version__ as TG_VER
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
@@ -53,11 +52,9 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     """Send a message when the command /help is issued."""
     await update.message.reply_text("Help!")
 
-async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
-    print(query.data)
-    query_data_dict = json.loads(query.data)
-    if "/pokemon" in query_data_dict["pokemon"]:
+    if "/pokemon" in query.data:
         is_Callback = True
         await search_pokemon(update, context, is_Callback)
 
@@ -69,38 +66,19 @@ async def search_pokemon(update: Update, context: ContextTypes.DEFAULT_TYPE, is_
         message_id = update.message.message_id
         chat_id = update.effective_chat.id
     elif is_Callback:
-        query_data = json.loads(update.callback_query.data)
-
-        pokemon_name = query_data["pokemon"]
+        pokemon_name = update.callback_query.data
         message_id = update.callback_query.message.message_id
         chat_id = update.callback_query.message.chat.id
 
     pokemon_name = pokemon_name.replace("/pokemon", "").strip().lower()
 
-    pokemonAPI.get_api_data(pokemon_name, query_data["variety"] if is_Callback else 0)
-    pokemon = pokemonAPI.elaborate_api_data(query_data["variety"] if is_Callback else 0)
+    pokemonAPI.get_api_data(pokemon_name)
+    pokemon = pokemonAPI.elaborate_api_data()
 
     keyboard = [
         [
-            InlineKeyboardButton(text = f"< N°{int(pokemon.id) - 1}", callback_data=json.dumps(
-                    {
-                        "pokemon" : f"/pokemon {int(pokemon.id) - 1}"
-                    }
-                )
-            ),
-            InlineKeyboardButton(text = f"Change Variety", callback_data=json.dumps(            
-                    {
-                        "pokemon" : f"/pokemon {int(pokemon.id)}",
-                        "variety" : f"{int(pokemon.variety) + 1}"
-                    }
-                )
-            ),
-            InlineKeyboardButton(text = f"N°{int(pokemon.id) + 1} >", callback_data=json.dumps(
-                    {
-                        "pokemon" : f"/pokemon {int(pokemon.id) + 1}"
-                    }
-                )
-            )
+            InlineKeyboardButton(text = f"< N°{int(pokemon.id) - 1}", callback_data=f"/pokemon {int(pokemon.id) - 1}"),
+            InlineKeyboardButton(text = f"N°{int(pokemon.id) + 1} >", callback_data=f"/pokemon {int(pokemon.id) + 1}")
         ]
     ]
 
@@ -112,14 +90,13 @@ async def search_pokemon(update: Update, context: ContextTypes.DEFAULT_TYPE, is_
             "name": pokemon.name,
             "id" : pokemon.id,
             "generation" : pokemon.generation,
-            "is_legendary" : " Leggendario" if pokemon.is_legendary else "",
+            "is_legendary" : "Leggendario" if pokemon.is_legendary else "",
             "types" : pokemon.types,
             "description" : pokemon.description
         }),
         photo = pokemon.photo,
         reply_to_message_id=message_id,
-        reply_markup=reply_markup,
-        parse_mode="html"
+        reply_markup=reply_markup
     )
     end_timestamp = time.time()
     print(f"Time occured: {end_timestamp - start_timestamp}")
@@ -133,7 +110,7 @@ def main() -> None:
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("help", help_command))
     application.add_handler(CommandHandler("pokemon", search_pokemon))
-    application.add_handler(CallbackQueryHandler(button_handler))
+    application.add_handler(CallbackQueryHandler(button))
 
     # Run the bot until the user presses Ctrl-C
     application.run_polling(allowed_updates=Update.ALL_TYPES)

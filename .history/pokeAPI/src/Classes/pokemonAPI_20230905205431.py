@@ -34,7 +34,7 @@ class PokemonAPI:
 
         name = self.data["name"].capitalize().split("-", 1)[0]
         
-        id = str(self.species_data["id"])
+        id = str(self.data["id"])
 
         photo = self.data["sprites"]["other"]["official-artwork"]["front_default"]
         photo_link = photo.replace("PokeAPI/sprites", "cristianDemarco/PokeAPI_sprites")
