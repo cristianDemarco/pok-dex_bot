@@ -15,6 +15,7 @@ Descrizione: <description>
 
 def translate(message, language: str = 'IT', data: dict = {}):
     translation = TEXTS[language][message]
+    print(data)
     for key in data:
         print(data[key], type(data[key]))
         translation = translation.replace(f'<{key}>', data[key])

@@ -53,41 +53,46 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
+    print(query)
     if "/pokemon" in query.data:
-        is_Callback = True
-        await search_pokemon(update, context, is_Callback)
+        callback_query_info = {
+            "is_Callback" : True,
+            "pokemon_name" : query.data,
+            "message_id" : query.message.from_user.id
+        }
+        await search_pokemon(update, context, callback_query_info)
 
 
-async def search_pokemon(update: Update, context: ContextTypes.DEFAULT_TYPE, is_Callback : bool = False) -> None:
-    if not is_Callback:
-        pokemon_name = update.message.text
+async def search_pokemon(update: Update, context: ContextTypes.DEFAULT_TYPE, callback_query_info : dict = {"isCallback" : False}) -> None:
+    print(callback_query_info)
+    if callback_query_info["isCallback"] != True:
+        pokemon_name = update.message.text.replace("/pokemon", "").strip().lower()
+    else:
+        pokemon_name = callback_query_info["pokemon_name"]
+
+    
+
+    if type(update.message.message_id) != None:
         message_id = update.message.message_id
-        chat_id = update.effective_chat.id
-    elif is_Callback:
-        pokemon_name = update.callback_query.data
-        message_id = update.callback_query.message.message_id
-        chat_id = update.callback_query.message.chat.id
-
-    pokemon_name = pokemon_name.replace("/pokemon", "").strip().lower()
-
-    print(f"\n\n{pokemon_name}, {message_id}, {chat_id}\n\n")
+    else:
+        message_id = callback_query_info["message_id"]
     pokemonAPI.get_api_data(pokemon_name)
     pokemon = pokemonAPI.elaborate_api_data()
 
     keyboard = [
         [
-            InlineKeyboardButton(text = "Option1", callback_data="/pokemon chimchar"),
-            InlineKeyboardButton(text = "Option2", callback_data="/pokemon chimchar")
+            InlineKeyboardButton(text = "Option1", callback_data="chimchar"),
+            InlineKeyboardButton(text = "Option2", callback_data="chimchar")
         ],
         [
-            InlineKeyboardButton(text = "Option3", callback_data="/pokemon charizard")
+            InlineKeyboardButton(text = "Option3", callback_data="charizard")
         ]
     ]
 
     reply_markup = InlineKeyboardMarkup(keyboard)
     
     await context.bot.send_photo(
-        chat_id = chat_id,
+        chat_id = update.effective_chat.id,
         caption = translate("POKEDEX_RETURN_MESSAGE", language="IT", data={
             "name": pokemon.name,
             "id" : pokemon.id,

@@ -26,7 +26,7 @@ class PokemonAPI:
 
     def elaborate_api_data(self) -> None:
 
-        name = self.data["name"].capitalize().replace("-standard", "")
+        name = self.data["name"].capitalize().replace("-standard")
         
         id = str(self.data["id"])
 

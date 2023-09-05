@@ -54,23 +54,29 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     if "/pokemon" in query.data:
-        is_Callback = True
-        await search_pokemon(update, context, is_Callback)
+        callback_query_info = {
+            "is_Callback" : True,
+            "pokemon_name" : query.data,
+            "message_id" : query.message.from_user.id,
+            "chat_id" : update.effective_chat.id
+        }
+        await search_pokemon(update, context, callback_query_info)
 
 
-async def search_pokemon(update: Update, context: ContextTypes.DEFAULT_TYPE, is_Callback : bool = False) -> None:
-    if not is_Callback:
+async def search_pokemon(update: Update, context: ContextTypes.DEFAULT_TYPE, callback_query_info : dict = {"is_Callback" : False}) -> None:
+
+    if not callback_query_info["is_Callback"]:
         pokemon_name = update.message.text
         message_id = update.message.message_id
         chat_id = update.effective_chat.id
-    elif is_Callback:
-        pokemon_name = update.callback_query.data
-        message_id = update.callback_query.message.message_id
-        chat_id = update.callback_query.message.chat.id
+    elif callback_query_info["is_Callback"]:
+        pokemon_name = callback_query_info["pokemon_name"]
+        message_id = callback_query_info["message_id"]
+        chat_id = callback_query_info["chat_id"]
 
     pokemon_name = pokemon_name.replace("/pokemon", "").strip().lower()
 
-    print(f"\n\n{pokemon_name}, {message_id}, {chat_id}\n\n")
+    print(message_id)
     pokemonAPI.get_api_data(pokemon_name)
     pokemon = pokemonAPI.elaborate_api_data()
 

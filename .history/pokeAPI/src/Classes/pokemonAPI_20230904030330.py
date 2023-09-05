@@ -26,7 +26,7 @@ class PokemonAPI:
 
     def elaborate_api_data(self) -> None:
 
-        name = self.data["name"].capitalize().replace("-standard", "")
+        name = self.data["name"].capitalize()
         
         id = str(self.data["id"])
 
@@ -35,13 +35,13 @@ class PokemonAPI:
 
         types = []
         
-        for type in self.data["types"]:
-            type_link = type["type"]["url"]
+        for element in self.data["types"]:
+            type_link = element["type"]["url"]
             data_response = requests.get(type_link).json()
-            for element in data_response["names"]:
-                if element["language"]["name"] == "it":
+            for language in data_response["names"]:
+                if language["name"] == "it":
                     types.append(element["name"])
-                    break
+
 
         types = ", ".join(types)
 

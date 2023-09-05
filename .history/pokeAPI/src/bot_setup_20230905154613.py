@@ -66,11 +66,11 @@ async def search_pokemon(update: Update, context: ContextTypes.DEFAULT_TYPE, is_
     elif is_Callback:
         pokemon_name = update.callback_query.data
         message_id = update.callback_query.message.message_id
-        chat_id = update.callback_query.message.chat.id
+        chat_id = update.callback_query.chat_instance
 
     pokemon_name = pokemon_name.replace("/pokemon", "").strip().lower()
 
-    print(f"\n\n{pokemon_name}, {message_id}, {chat_id}\n\n")
+    print(f"\n\n{pokemon_name}, {message_id}, {chat_id}, {chat_id}\n\n")
     pokemonAPI.get_api_data(pokemon_name)
     pokemon = pokemonAPI.elaborate_api_data()
 

@@ -26,7 +26,7 @@ class PokemonAPI:
 
     def elaborate_api_data(self) -> None:
 
-        name = self.data["name"].capitalize().replace("-standard", "")
+        name = self.data["name"].capitalize()
         
         id = str(self.data["id"])
 
@@ -41,7 +41,7 @@ class PokemonAPI:
             for element in data_response["names"]:
                 if element["language"]["name"] == "it":
                     types.append(element["name"])
-                    break
+
 
         types = ", ".join(types)
 

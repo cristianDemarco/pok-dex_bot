@@ -25,7 +25,7 @@ if __version_info__ < (20, 0, 0, "alpha", 1):
         f"visit https://docs.python-telegram-bot.org/en/v{TG_VER}/examples.html"
     )
 from telegram import ForceReply, Update
-from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters, CallbackQueryHandler
+from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
@@ -51,32 +51,15 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     """Send a message when the command /help is issued."""
     await update.message.reply_text("Help!")
 
-async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    query = update.callback_query
-    if "/pokemon" in query.data:
-        is_Callback = True
-        await search_pokemon(update, context, is_Callback)
 
-
-async def search_pokemon(update: Update, context: ContextTypes.DEFAULT_TYPE, is_Callback : bool = False) -> None:
-    if not is_Callback:
-        pokemon_name = update.message.text
-        message_id = update.message.message_id
-        chat_id = update.effective_chat.id
-    elif is_Callback:
-        pokemon_name = update.callback_query.data
-        message_id = update.callback_query.message.message_id
-        chat_id = update.callback_query.message.chat.id
-
-    pokemon_name = pokemon_name.replace("/pokemon", "").strip().lower()
-
-    print(f"\n\n{pokemon_name}, {message_id}, {chat_id}\n\n")
+async def search_pokemon(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    pokemon_name = update.message.text.replace("/pokemon", "").strip().lower()
     pokemonAPI.get_api_data(pokemon_name)
     pokemon = pokemonAPI.elaborate_api_data()
 
     keyboard = [
         [
-            InlineKeyboardButton(text = "Option1", callback_data="/pokemon chimchar"),
+            InlineKeyboardButton(text = "Option1", callback_data="chimchar"),
             InlineKeyboardButton(text = "Option2", callback_data="/pokemon chimchar")
         ],
         [
@@ -87,7 +70,7 @@ async def search_pokemon(update: Update, context: ContextTypes.DEFAULT_TYPE, is_
     reply_markup = InlineKeyboardMarkup(keyboard)
     
     await context.bot.send_photo(
-        chat_id = chat_id,
+        chat_id = update.effective_chat.id,
         caption = translate("POKEDEX_RETURN_MESSAGE", language="IT", data={
             "name": pokemon.name,
             "id" : pokemon.id,
@@ -95,9 +78,10 @@ async def search_pokemon(update: Update, context: ContextTypes.DEFAULT_TYPE, is_
             "description" : pokemon.description
         }),
         photo = pokemon.photo,
-        reply_to_message_id=message_id,
+        reply_to_message_id=update.message.message_id,
         reply_markup=reply_markup
     )
+
 
 def main() -> None:
     """Start the bot."""
@@ -108,7 +92,6 @@ def main() -> None:
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("help", help_command))
     application.add_handler(CommandHandler("pokemon", search_pokemon))
-    application.add_handler(CallbackQueryHandler(button))
 
     # Run the bot until the user presses Ctrl-C
     application.run_polling(allowed_updates=Update.ALL_TYPES)
