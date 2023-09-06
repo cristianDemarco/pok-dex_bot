@@ -55,11 +55,9 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     await update.message.reply_text("Help!")
 
 async def set_limit(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    text = update.message.text
+    query_data = update.callback_query
     global messages_limit 
-    messages_limit = int(text.replace("/setlimit", "").strip())
-
-    await update.message.reply_text(f"Adesso puoi vedere {messages_limit} pokémon contemporaneamente!")
+    messages_limit = int(query_data.data.replace("/limit", "").strip())
 
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE): 
     await search_pokemon(update, context, True)

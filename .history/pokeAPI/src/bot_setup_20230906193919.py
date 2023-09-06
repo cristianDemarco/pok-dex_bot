@@ -48,25 +48,20 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         reply_markup=ForceReply(selective=True),
     )
 
-messages_limit = 1
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send a message when the command /help is issued."""
     await update.message.reply_text("Help!")
 
-async def set_limit(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    text = update.message.text
-    global messages_limit 
-    messages_limit = int(text.replace("/setlimit", "").strip())
-
-    await update.message.reply_text(f"Adesso puoi vedere {messages_limit} pokémon contemporaneamente!")
-
-async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE): 
+async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await search_pokemon(update, context, True)
+    #print(update.callback_query.data)
 
 messages_to_delete = []
+messages_limit = 1
 
 async def search_pokemon(update: Update, context: ContextTypes.DEFAULT_TYPE, is_Callback : bool = False) -> None:
+    print(messages_to_delete)
     start_timestamp = time.time()
     if not is_Callback:
         pokemon_name = update.message.text
@@ -112,16 +107,16 @@ async def search_pokemon(update: Update, context: ContextTypes.DEFAULT_TYPE, is_
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     if len(messages_to_delete) >= messages_limit:
-        for id in messages_to_delete[0].copy():
+        for id in messages_to_delete[0].copy:
             await context.bot.deleteMessage(chat_id=chat_id, message_id=id)
         messages_to_delete.pop(0)
 
-    #for i, request in enumerate(messages_to_delete):
-    #    for id in request.copy():
-    #        
-    #        messages_to_delete[i].remove(id)
-    #    if not request:
-    #        messages_to_delete.remove(request)
+    for i, request in enumerate(messages_to_delete):
+        for id in request.copy():
+            
+            messages_to_delete[i].remove(id)
+        if not request:
+            messages_to_delete.remove(request)
     
     message = await context.bot.send_photo(
         chat_id = chat_id,
@@ -159,7 +154,6 @@ def main() -> None:
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("help", help_command))
     application.add_handler(CommandHandler("pokemon", search_pokemon))
-    application.add_handler(CommandHandler("setlimit", set_limit))
     application.add_handler(CallbackQueryHandler(button_handler))
 
     # Run the bot until the user presses Ctrl-C
