@@ -71,6 +71,9 @@ async def search_pokemon(update: Update, context: ContextTypes.DEFAULT_TYPE, is_
         pokemon_name = query_data["pokemon"]
         chat_id = update.callback_query.message.chat.id
 
+    for id in messages_to_delete:
+        await context.bot.deleteMessage(chat_id=chat_id, message_id=id)
+
     pokemon_name = pokemon_name.replace("/pokemon", "").strip().lower()
 
     pokemonAPI.get_api_data(pokemon_name, query_data["variety"] if is_Callback else 0)
@@ -86,7 +89,7 @@ async def search_pokemon(update: Update, context: ContextTypes.DEFAULT_TYPE, is_
                     }
                 )
             ),
-            InlineKeyboardButton(text = f"Cambia forma", callback_data=json.dumps(            
+            InlineKeyboardButton(text = f"Change Variety", callback_data=json.dumps(            
                     {
                         "pokemon" : f"/pokemon {int(pokemon.id)}",
                         "variety" : f"{int(pokemon.variety) + 1}"
@@ -112,7 +115,6 @@ async def search_pokemon(update: Update, context: ContextTypes.DEFAULT_TYPE, is_
             "id" : pokemon.id,
             "generation" : pokemon.generation,
             "is_legendary" : "  [Leggendario]" if pokemon.is_legendary else "",
-            "is_mythical" : "  [Misterioso]" if pokemon.is_mythical else "",
             "types" : pokemon.types,
             "description" : pokemon.description
         }),
@@ -120,23 +122,8 @@ async def search_pokemon(update: Update, context: ContextTypes.DEFAULT_TYPE, is_
         reply_markup=reply_markup,
         parse_mode="html"
     )
-
-    for i, request in enumerate(messages_to_delete):
-        for id in request.copy():
-            await context.bot.deleteMessage(chat_id=chat_id, message_id=id)
-            messages_to_delete[i].remove(id)
-        if not request:
-            messages_to_delete.remove(request)
-
-    ids_to_add = []
-    
-    ids_to_add.append(message.message_id)
-    if not is_Callback:
-        ids_to_add.append(update.message.message_id)
-
-    messages_to_delete.append(ids_to_add)
-
     end_timestamp = time.time()
+    messages_to_delete.append(message.message_id)
     print(f"Time occured: {end_timestamp - start_timestamp}")
 
 def main() -> None:

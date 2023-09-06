@@ -21,7 +21,7 @@ class PokemonAPI:
             self.species_data = species_data_response.json()
             
         if variety > len(self.species_data["varieties"]) - 1:
-            variety = 0
+            variety = variety - len(self.species_data["varieties"]) - 1
                     
         pokemon_variety = self.species_data["varieties"][variety]["pokemon"]["name"]
 
@@ -51,26 +51,18 @@ class PokemonAPI:
 
         types = ", ".join(types)
 
-        warning = ""
         descriptions = self.species_data["flavor_text_entries"]
-
         descriptions_set = set(description["flavor_text"] for description in descriptions if description["language"]["name"] == "it")
 
-        if len(descriptions_set) == 0:
-            descriptions_set = set(description["flavor_text"] for description in descriptions if description["language"]["name"] == "en")
-            warning = "La descrizione non è disponbile in italiano.\n"
-
-        description = warning + " ".join(random.choice(list(descriptions_set)).split())
+        description = " ".join(random.choice(list(descriptions_set)).split())
 
         generation = self.species_data["generation"]["url"]
         pattern = r"/generation/(\d+)/"
         generation = re.search(pattern, generation).group(1)
         is_legendary = self.species_data["is_legendary"]
-        is_mythical = self.species_data["is_mythical"]
-        number_of_varieties = len(self.species_data["varieties"])
 
 
-        return Pokemon(name, id, generation, is_legendary, is_mythical, photo_link, types, description, 0 if int(variety) > number_of_varieties - 1 else variety)        
+        return Pokemon(name, id, generation, is_legendary, photo_link, types, description, variety)        
             
 
     

@@ -86,7 +86,7 @@ async def search_pokemon(update: Update, context: ContextTypes.DEFAULT_TYPE, is_
                     }
                 )
             ),
-            InlineKeyboardButton(text = f"Cambia forma", callback_data=json.dumps(            
+            InlineKeyboardButton(text = f"Change Variety", callback_data=json.dumps(            
                     {
                         "pokemon" : f"/pokemon {int(pokemon.id)}",
                         "variety" : f"{int(pokemon.variety) + 1}"

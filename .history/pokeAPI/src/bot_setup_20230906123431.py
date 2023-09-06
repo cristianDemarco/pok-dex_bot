@@ -55,20 +55,22 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await search_pokemon(update, context, True)
-    #print(update.callback_query.data)
+    print(update.callback_query.data)
 
 messages_to_delete = []
+print(messages_to_delete)
 
 async def search_pokemon(update: Update, context: ContextTypes.DEFAULT_TYPE, is_Callback : bool = False) -> None:
-    print(messages_to_delete)
     start_timestamp = time.time()
     if not is_Callback:
         pokemon_name = update.message.text
+        message_id = update.message.message_id
         chat_id = update.effective_chat.id
     elif is_Callback:
         query_data = json.loads(update.callback_query.data)
 
         pokemon_name = query_data["pokemon"]
+        message_id = update.callback_query.message.message_id
         chat_id = update.callback_query.message.chat.id
 
     pokemon_name = pokemon_name.replace("/pokemon", "").strip().lower()
@@ -86,7 +88,7 @@ async def search_pokemon(update: Update, context: ContextTypes.DEFAULT_TYPE, is_
                     }
                 )
             ),
-            InlineKeyboardButton(text = f"Cambia forma", callback_data=json.dumps(            
+            InlineKeyboardButton(text = f"Change Variety", callback_data=json.dumps(            
                     {
                         "pokemon" : f"/pokemon {int(pokemon.id)}",
                         "variety" : f"{int(pokemon.variety) + 1}"
@@ -105,38 +107,23 @@ async def search_pokemon(update: Update, context: ContextTypes.DEFAULT_TYPE, is_
 
     reply_markup = InlineKeyboardMarkup(keyboard)
     
-    message = await context.bot.send_photo(
+    await context.bot.send_photo(
         chat_id = chat_id,
         caption = translate("POKEDEX_RETURN_MESSAGE", language="IT", data={
             "name": pokemon.name,
             "id" : pokemon.id,
             "generation" : pokemon.generation,
             "is_legendary" : "  [Leggendario]" if pokemon.is_legendary else "",
-            "is_mythical" : "  [Misterioso]" if pokemon.is_mythical else "",
             "types" : pokemon.types,
             "description" : pokemon.description
         }),
         photo = pokemon.photo,
+        reply_to_message_id=message_id,
         reply_markup=reply_markup,
         parse_mode="html"
     )
-
-    for i, request in enumerate(messages_to_delete):
-        for id in request.copy():
-            await context.bot.deleteMessage(chat_id=chat_id, message_id=id)
-            messages_to_delete[i].remove(id)
-        if not request:
-            messages_to_delete.remove(request)
-
-    ids_to_add = []
-    
-    ids_to_add.append(message.message_id)
-    if not is_Callback:
-        ids_to_add.append(update.message.message_id)
-
-    messages_to_delete.append(ids_to_add)
-
     end_timestamp = time.time()
+    messages_to_delete.push(message_id)
     print(f"Time occured: {end_timestamp - start_timestamp}")
 
 def main() -> None:

@@ -6,7 +6,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 TEXTS = {
     "IT":{
         "POKEDEX_RETURN_MESSAGE" : f"""
-<name> N°<id><b><is_legendary></b><b><is_mythical></b>
+<name> N°<id><b><is_legendary></b>
 <generation>° Generazione
 <b>Tipo:</b> <types>\n
 <b>Descrizione:</b> <description>

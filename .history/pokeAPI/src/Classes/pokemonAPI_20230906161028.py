@@ -66,11 +66,11 @@ class PokemonAPI:
         pattern = r"/generation/(\d+)/"
         generation = re.search(pattern, generation).group(1)
         is_legendary = self.species_data["is_legendary"]
-        is_mythical = self.species_data["is_mythical"]
+        is_legendary = self.species_data["is_mythical"]
         number_of_varieties = len(self.species_data["varieties"])
 
 
-        return Pokemon(name, id, generation, is_legendary, is_mythical, photo_link, types, description, 0 if int(variety) > number_of_varieties - 1 else variety)        
+        return Pokemon(name, id, generation, is_legendary, photo_link, types, description, 0 if int(variety) > number_of_varieties - 1 else variety)        
             
 
     

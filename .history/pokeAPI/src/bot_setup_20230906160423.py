@@ -86,7 +86,7 @@ async def search_pokemon(update: Update, context: ContextTypes.DEFAULT_TYPE, is_
                     }
                 )
             ),
-            InlineKeyboardButton(text = f"Cambia forma", callback_data=json.dumps(            
+            InlineKeyboardButton(text = f"Change Variety", callback_data=json.dumps(            
                     {
                         "pokemon" : f"/pokemon {int(pokemon.id)}",
                         "variety" : f"{int(pokemon.variety) + 1}"
@@ -112,7 +112,6 @@ async def search_pokemon(update: Update, context: ContextTypes.DEFAULT_TYPE, is_
             "id" : pokemon.id,
             "generation" : pokemon.generation,
             "is_legendary" : "  [Leggendario]" if pokemon.is_legendary else "",
-            "is_mythical" : "  [Misterioso]" if pokemon.is_mythical else "",
             "types" : pokemon.types,
             "description" : pokemon.description
         }),
